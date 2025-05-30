@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useBooking } from "../App";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 /**
  * PUBLIC_INTERFACE
@@ -8,6 +8,7 @@ import { useLocation } from "react-router-dom";
  * - Dropdown for booking purpose selection.
  * - Dynamically displays a contextual form styled in UniBookX theme (black-orange, atomic CSS).
  * - On submit, persists to shared booking history state for admin dashboard.
+ * - Prefills the booking form if incoming selection details are available from route state/params.
  */
 const PURPOSES = [
   { value: "sports", emoji: "🏟️", label: "Sports Events" },
@@ -134,36 +135,57 @@ function BookingFormFields({ purpose, form, setForm }) {
   }
 }
 
+// PUBLIC_INTERFACE
 function BookingFlow() {
-  // PUBLIC_INTERFACE
   /**
-   * BookingFlow – top-level component for booking forms
-   * If navigated via search, prefill form & purpose using react-router location.state
+   * BookingFlow – Accepts incoming selection details via route state or params to initialize
+   * form and booking purpose (for prefilled booking experience).
    */
   const location = useLocation();
-  const { state } = location;
+  const params = useParams();
+  const { state } = location || {};
+
   const { addBooking } = useBooking();
 
-  // Purpose and form states, with support for prefill on nav
-  const [purpose, setPurpose] = useState(() => (state && state.purpose) || "");
+  // Determine initial purpose and form from route state or URL params
+  const initialPurpose =
+    (state && state.purpose) ||
+    (params && params.purpose) ||
+    "";
+
+  const initialPrefill =
+    (state && state.prefill) ||
+    {};
+
+  // Setup state for purpose and form, supporting prefill from router data
+  const [purpose, setPurpose] = useState(initialPurpose);
   const [form, setForm] = useState(() => {
-    if (state && state.purpose && state.prefill) {
-      // Start with initial for this purpose and override prefill (in case not all keys are there)
-      return { ...getInitialForm(state.purpose), ...state.prefill };
+    if (initialPurpose) {
+      // Compose starting form with prefill (from state or param, if any)
+      return {
+        ...getInitialForm(initialPurpose),
+        ...initialPrefill
+      };
     }
     return getInitialForm("");
   });
   const [submitted, setSubmitted] = useState(false);
 
-  // If route state changes (e.g. direct nav), update purpose and form
+  // If navigation params or location state changes after mount, apply
   useEffect(() => {
-    if (state && state.purpose) {
-      setPurpose(state.purpose);
-      setForm(prev => ({ ...getInitialForm(state.purpose), ...state.prefill }));
+    let npurpose =
+      (state && state.purpose) ||
+      (params && params.purpose) ||
+      "";
+    let nprefill = (state && state.prefill) || {};
+
+    if (npurpose) {
+      setPurpose(npurpose);
+      setForm({ ...getInitialForm(npurpose), ...nprefill });
     }
-  // We only want to re-run when navigating with state info
+  // Only update when route state or params change
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  }, [JSON.stringify(state), JSON.stringify(params)]);
 
   function handlePurposeChange(e) {
     setPurpose(e.target.value);
