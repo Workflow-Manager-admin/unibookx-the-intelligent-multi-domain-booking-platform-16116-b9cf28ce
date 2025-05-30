@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import MainLayout from './components/MainLayout';
-
+import SearchBar from "./components/SearchBar";
+import DomainFilter from "./components/DomainFilter";
+import SearchResults from "./components/SearchResults";
 import {
   BrowserRouter as Router,
   Routes,
@@ -19,10 +21,6 @@ const Home = () => (
     </div>
   </section>
 );
-import SearchBar from "./components/SearchBar";
-import DomainFilter from "./components/DomainFilter";
-import SearchResults from "./components/SearchResults";
-import { useState } from "react";
 
 const MOCK_RESULTS = [
   // Demo event cards for mock search
