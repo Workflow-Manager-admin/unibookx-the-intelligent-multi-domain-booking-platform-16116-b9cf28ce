@@ -138,11 +138,32 @@ function BookingFlow() {
   // PUBLIC_INTERFACE
   /**
    * BookingFlow – top-level component for booking forms
+   * If navigated via search, prefill form & purpose using react-router location.state
    */
-  const [purpose, setPurpose] = useState("");
-  const [form, setForm] = useState(getInitialForm(""));
-  const [submitted, setSubmitted] = useState(false);
+  const location = useLocation();
+  const { state } = location;
   const { addBooking } = useBooking();
+
+  // Purpose and form states, with support for prefill on nav
+  const [purpose, setPurpose] = useState(() => (state && state.purpose) || "");
+  const [form, setForm] = useState(() => {
+    if (state && state.purpose && state.prefill) {
+      // Start with initial for this purpose and override prefill (in case not all keys are there)
+      return { ...getInitialForm(state.purpose), ...state.prefill };
+    }
+    return getInitialForm("");
+  });
+  const [submitted, setSubmitted] = useState(false);
+
+  // If route state changes (e.g. direct nav), update purpose and form
+  useEffect(() => {
+    if (state && state.purpose) {
+      setPurpose(state.purpose);
+      setForm(prev => ({ ...getInitialForm(state.purpose), ...state.prefill }));
+    }
+  // We only want to re-run when navigating with state info
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   function handlePurposeChange(e) {
     setPurpose(e.target.value);
