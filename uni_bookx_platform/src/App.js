@@ -4,6 +4,7 @@ import MainLayout from './components/MainLayout';
 import SearchBar from "./components/SearchBar";
 import DomainFilter from "./components/DomainFilter";
 import SearchResults from "./components/SearchResults";
+import AdminProfile from "./components/AdminProfile";
 import {
   BrowserRouter as Router,
   Routes,
@@ -564,7 +565,7 @@ function App() {
             <Route path="/search" element={<UniversalSearch />} />
             <Route path="/booking" element={<BookingFlow />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin" element={<AdminProfile />} />
             {/* Default fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
