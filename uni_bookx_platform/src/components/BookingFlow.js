@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useBooking } from "../App";
+import { useLocation } from "react-router-dom";
 
 /**
  * PUBLIC_INTERFACE
