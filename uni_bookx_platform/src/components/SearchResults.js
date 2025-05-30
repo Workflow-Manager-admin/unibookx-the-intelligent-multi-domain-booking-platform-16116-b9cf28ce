@@ -90,6 +90,7 @@ function SearchResults({ results }) {
 
     // Only proceed if purpose is mapped; otherwise, fallback: go to booking with empty state (user must select)
     if (purpose) {
+      // Pass as route state in React Router v6
       navigate("/booking", { state: { purpose, prefill, sourceEvent: item } });
     } else {
       // fallback for unmapped/card types (route anyway, blank)
