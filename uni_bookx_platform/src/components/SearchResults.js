@@ -85,8 +85,16 @@ function SearchResults({ results }) {
 
   // Handler for clicking a card: go to booking page with state to prefill
   function handleResultClick(item) {
+    // Ensure all relevant details are passed (including original item for debugging if needed)
     const { purpose, prefill } = mapResultToBookingPrefill(item);
-    navigate("/booking", { state: { purpose, prefill } });
+
+    // Only proceed if purpose is mapped; otherwise, fallback: go to booking with empty state (user must select)
+    if (purpose) {
+      navigate("/booking", { state: { purpose, prefill, sourceEvent: item } });
+    } else {
+      // fallback for unmapped/card types (route anyway, blank)
+      navigate("/booking");
+    }
   }
 
   return (
